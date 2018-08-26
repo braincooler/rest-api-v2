@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet id="25.08.2018-1" author="w.zeller@online.de" runInTransaction="true">
+
+		<!-- color -->
+		<createTable tableName="color">
+			<column autoIncrement="true" name="id" type="int"><constraints primaryKey="true" nullable="false"/></column>
+			<column name="color" type="varchar(20)"></column>
+		</createTable>
+		
+		<!-- person -->
+		<createTable tableName="person">
+			<column autoIncrement="true" name="id" type="int"><constraints primaryKey="true" nullable="false"/></column>
+			<column name="lastname" type="varchar(20)"></column>
+			<column name="firstname" type="varchar(20)"></column>
+			<column name="zipcode" type="varchar(8)"></column>
+			<column name="city" type="varchar(20)"></column>
+			<column name="colorid" type="int"><constraints foreignKeyName="person_color_fk1" referencedTableName="color" referencedColumnNames="id" nullable="true" deleteCascade="false"/></column>				
+		</createTable>
+		
+		<!-- add colors -->
+		<insert tableName="color">
+	        <column name="color">Blau</column>
+	    </insert>
+	    <insert tableName="color">
+	        <column name="color">Grün</column>
+	    </insert>
+	    <insert tableName="color">
+	        <column name="color">Lila</column>
+	    </insert>
+	    <insert tableName="color">
+	        <column name="color">Rot</column>
+	    </insert>
+	    <insert tableName="color">
+	        <column name="color">Zitronengelb</column>
+	    </insert>
+	    <insert tableName="color">
+	        <column name="color">Türkis</column>
+	    </insert>
+	    <insert tableName="color">
+	        <column name="color">Weiß</column>
+	    </insert>
+
+	</changeSet>
+</databaseChangeLog>
