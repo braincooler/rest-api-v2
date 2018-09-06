@@ -1,10 +1,10 @@
 package de.assecor.personcolorrestapi.controller;
 
 import java.util.List;
-import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,8 +21,7 @@ import de.assecor.personcolorrestapi.service.PersonService;
 @RequestMapping(value="persons")
 public class PersonController {
 	
-	@Autowired
-	private PersonService personService;
+	@Autowired private PersonService personService;
 	
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Person>> getPersons(){
@@ -32,10 +31,7 @@ public class PersonController {
 	
 	@GetMapping(value="/{personId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Person> getPersonById (@PathVariable Long personId){
-		Optional<Person> person = personService.findById(personId);
-		if (person.isPresent())
-			return ResponseEntity.ok(person.get());
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		return ResponseEntity.ok(personService.findById(personId));
 	}
 	
 	@GetMapping(value = "/color/{color}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,8 +41,7 @@ public class PersonController {
 	}
 	
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Person> savePerson(@RequestBody Person person){
-		System.out.println(person);
-		return ResponseEntity.ok(personService.save(person));
+	public ResponseEntity<Person> savePerson(@RequestBody @Valid Person person){
+		return ResponseEntity.status(201).body(personService.save(person));
 	}
 }

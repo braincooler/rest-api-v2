@@ -1,34 +1,27 @@
 package de.assecor.personcolorrestapi.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import de.assecor.personcolorrestapi.entity.ColorEntity;
 import de.assecor.personcolorrestapi.entity.PersonEntity;
-import de.assecor.personcolorrestapi.model.Color;
+import de.assecor.personcolorrestapi.exceptions.ColorNotFoundException;
+import de.assecor.personcolorrestapi.exceptions.PersonNotFoundException;
 import de.assecor.personcolorrestapi.model.Person;
-import de.assecor.personcolorrestapi.repository.ColorJpaRepository;
-import de.assecor.personcolorrestapi.repository.ColorRepository;
-import de.assecor.personcolorrestapi.repository.PersonCsvRepository;
-import de.assecor.personcolorrestapi.repository.PersonJpaRepository;
+import de.assecor.personcolorrestapi.repository.interfaces.ColorRepository;
+import de.assecor.personcolorrestapi.repository.interfaces.PersonRepository;
 
 @Service
 public class PersonService {
 
-	@Autowired
-	private PersonCsvRepository personRepository;
-	@Autowired
+	@Autowired @Qualifier("PersonCsvRepository")
+	private PersonRepository personRepository;
+	@Autowired @Qualifier("ColorCsvRepository")
 	private ColorRepository colorRepository;
-	
-//	@Autowired
-//	private PersonJpaRepository personRepository;
-//	@Autowired
-//	private ColorJpaRepository colorRepository;
-	
 
 	public List<Person> findAll() {		
 		return personRepository.findAll()
@@ -37,11 +30,10 @@ public class PersonService {
 				.collect(Collectors.toList());
 	}
 
-	public Optional<Person> findById(Long personId) {	
-		Optional<PersonEntity> person = personRepository.findById(personId);
-		if(person.isPresent())
-			return Optional.of(mapToPerson(person.get()));
-		return Optional.empty();
+	public Person findById(Long personId) {	
+		PersonEntity person = personRepository.findById(personId)
+				.orElseThrow(() -> new PersonNotFoundException("Person not found"));
+		return mapToPerson(person);
 	}
 
 	public List<Person> findByColorId(Long colorId) {
@@ -51,20 +43,26 @@ public class PersonService {
 				.collect(Collectors.toList());
 	}
 
-	public Person save(Person p) {
-		ColorEntity colorEntity = colorRepository.getColorEntityByColor(p.getColor());
-		PersonEntity personEntity = new PersonEntity(p.getId(), p.getLastname(), p.getFirstname(), p.getZipcode(), p.getCity(), colorEntity);
+	public Person save(Person person) {		
+		ColorEntity colorEntity = colorRepository.getColorEntityByColor(person.getColor())
+				.orElseThrow(() -> new ColorNotFoundException("Color " + person.getColor() + " not found"));
+		PersonEntity personEntity = new PersonEntity(person.getId(), 
+				person.getLastname(), 
+				person.getFirstname(), 
+				person.getZipcode(), 
+				person.getCity(), 
+				colorEntity);
 		PersonEntity savedPerson = personRepository.save(personEntity);
 		return (mapToPerson(savedPerson));		
 	}
 	
-	private Person mapToPerson(PersonEntity p) {
-		Person person = new Person(p.getId(),
-				p.getLastname(), 
-				p.getFirstname(), 
-				p.getZipcode(), 
-				p.getCity(), 
-				p.getColor().getColor());
+	private Person mapToPerson(PersonEntity personEntity) {
+		Person person = new Person(personEntity.getId(),
+				personEntity.getLastname(), 
+				personEntity.getFirstname(), 
+				personEntity.getZipcode(), 
+				personEntity.getCity(), 
+				personEntity.getColor().getColor());
 		return person;
 	}
 }

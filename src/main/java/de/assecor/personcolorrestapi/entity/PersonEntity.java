@@ -8,12 +8,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity
-@Table(name = "person")
+@Entity @Table(name = "person")
 public class PersonEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String lastname;
@@ -21,8 +19,7 @@ public class PersonEntity {
 	private String zipcode;
 	private String city;
 	
-	@ManyToOne
-	@JoinColumn(name = "colorid")
+	@ManyToOne @JoinColumn(name = "colorid")
 	private ColorEntity color;
 
 	public PersonEntity() {

@@ -2,23 +2,25 @@ package de.assecor.personcolorrestapi.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import de.assecor.personcolorrestapi.entity.ColorEntity;
+import de.assecor.personcolorrestapi.repository.interfaces.ColorRepository;
 
-@Repository
-public class ColorRepository {
+@Repository @Qualifier("ColorCsvRepository")
+public class ColorCsvRepository implements ColorRepository{
 
 	private List<ColorEntity> colors = new ArrayList<>();
 	
-	public ColorEntity getColorEntityByColor(String color) {
-		ColorEntity result = colors.stream()
+	public Optional<ColorEntity> getColorEntityByColor(String color) {
+		Optional<ColorEntity> result = colors.stream()
 				.filter(c -> c.getColor().equals(color))
-				.findFirst()
-				.get();
+				.findFirst();
 		return result;
 	}
 	
@@ -33,10 +35,7 @@ public class ColorRepository {
 		colors.add(new ColorEntity(7L, "Weiß"));		
 	}
 
-	public ColorEntity findById(Long id) {
-		return colors.stream()
-			.filter(c -> c.getId() == id)
-			.findFirst()
-			.get();
-	}	
+	public Optional<ColorEntity> findById(Long id) {
+		return colors.stream().filter(c -> c.getId() == id).findFirst();
+	}
 }

@@ -16,20 +16,24 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import de.assecor.personcolorrestapi.entity.ColorEntity;
 import de.assecor.personcolorrestapi.entity.PersonEntity;
+import de.assecor.personcolorrestapi.repository.interfaces.PersonRepository;
 
-@Repository
-public class PersonCsvRepository {
-
-	private String path = "E:\\data.csv";
+@Repository @Qualifier("PersonCsvRepository")
+public class PersonCsvRepository implements PersonRepository{
+	
+	@Value("${path.to.csv.file}")
+	private String path;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PersonCsvRepository.class);
 	
 	@Autowired
-	private ColorRepository colorRepository;
+	private ColorCsvRepository colorRepository;
 
 	private List<PersonEntity> persons = new ArrayList<>();
 
@@ -56,9 +60,10 @@ public class PersonCsvRepository {
 
 	public PersonEntity save(PersonEntity person) {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, true))) {
-			bw.newLine();
 			bw.write(person.getLastname() + ", " + person.getFirstname() + ", " + person.getZipcode() + " "
-					+ person.getCity() + ", " + (person.getColor().getId() + 1));
+					+ person.getCity() + ", " + (person.getColor().getId()));
+			bw.newLine();
+
 		} catch (Exception e) {
 			LOGGER.error("Error on write csv", e);
 		}
@@ -82,14 +87,14 @@ public class PersonCsvRepository {
 				String zipcode = data[2].trim().substring(0, data[2].trim().indexOf(" "));
 				String city = data[2].trim().substring(data[2].trim().indexOf(" ") + 1);
 				Long colorId = Long.valueOf(data[3].replaceAll("[^\\d.]", ""));
-				ColorEntity colorEntity = colorRepository.findById(colorId);
+				ColorEntity colorEntity = colorRepository.findById(colorId).orElse(null);
 				PersonEntity person = new PersonEntity(index, lastname, firstname, zipcode, city, colorEntity);
 				persons.add(person);
 				index++;
 			}
 
 		} catch (IOException e) {
-			LOGGER.error("Error on load csv", e);
+			LOGGER.error("Error on load csv");
 		}
 	}
 }

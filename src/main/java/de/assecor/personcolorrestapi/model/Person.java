@@ -1,10 +1,12 @@
 package de.assecor.personcolorrestapi.model;
 
+import javax.validation.constraints.NotNull;
+
 public class Person {
 	
 	private Long id;
-	private String lastname;
-	private String firstname;
+	@NotNull private String lastname;
+	@NotNull private String firstname;
 	private String zipcode;
 	private String city;
 	private String color;
